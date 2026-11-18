@@ -72,6 +72,7 @@ img,video{max-width:100%;display:block}
 .scan-line{position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,transparent,var(--holo-c),transparent);box-shadow:0 0 18px 4px rgba(168,240,212,.5);animation:scan 1.6s ease-in-out 4}
 @keyframes scan{0%{top:0}50%{top:calc(100% - 3px)}100%{top:0}}
 .approved{font-family:var(--font-mono);font-weight:600;font-size:15px;letter-spacing:.2em;color:var(--holo-c);margin-top:16px;opacity:0;transform:scale(1.6)}
+.errata-msg{font-family:var(--font-display);font-weight:700;font-size:22px;line-height:1.35;text-align:center;max-width:320px;margin:0 auto 18px}
 .approved.on{animation:stamp .45s cubic-bezier(.2,1.4,.4,1) forwards}
 @keyframes stamp{to{opacity:1;transform:scale(1)}}
 
@@ -276,6 +277,12 @@ textarea::placeholder{color:#6d628f}
     <div class="approved" id="approved">✓ APROBADA</div>
   </div>
   <button class="skip-btn" id="skip2" type="button">SALTAR ▸</button>
+</section>
+
+<!-- ERRATA (solo Marlyn) -->
+<section class="screen" id="scr-errata">
+  <div class="errata-msg fade-in">Nos equivocamos con tu nombre.<br>El departamento de ortografía<br>ya fue despedido. 🫡</div>
+  <div class="wordmark-sub fade-in" style="animation-delay:2.2s">MARLYN · CON Y · CORREGIDO ✓</div>
 </section>
 
 <!-- STAGE -->
@@ -492,7 +499,7 @@ var GUESTS = {
   alonso:  {num:"002", name:"Alonso Camacho", access:"ALL ACCESS"},
   alexis:  {num:"003", name:"Alexis González", access:"ALL ACCESS"},
   gerardo: {num:"004", name:"Gerardo Ruíz",   access:"ALL ACCESS"},
-  marlin:  {num:"005", name:"Marlin López",   access:"ALL ACCESS"},
+  marlyn:  {num:"005", name:"Marlyn López",   access:"ALL ACCESS"},
   aranza:  {num:"006", name:"Aranza Aparicio",access:"ALL ACCESS"}
 };
 var FECHAS = {
@@ -519,6 +526,7 @@ function store(k,v){ try{ if(v===undefined) return sessionStorage.getItem(k); se
 /* ---------- boot ---------- */
 function currentGid(){
   var h = (location.hash||"").replace("#","").toLowerCase();
+  if (h==="marlin") { h="marlyn"; try{ history.replaceState(null,"","#marlyn"); }catch(e){} }
   return GUESTS[h] ? h : null;
 }
 function boot(){
@@ -563,7 +571,12 @@ function runScan(){
   $("#scan-name").textContent = guest.name;
   var sl=$("#scanline"); sl.style.animation="none"; void sl.offsetWidth; sl.style.animation="";
   later(function(){ $("#approved").classList.add("on"); },7200);
-  later(function(){ goStage(true); },10200);
+  if (gid==="marlyn") {
+    later(function(){ setScreen("scr-errata"); },9200);
+    later(function(){ goStage(true); },15200);
+  } else {
+    later(function(){ goStage(true); },10200);
+  }
 }
 function skipIntro(){ clearTimers(); goStage(true); }
 $("#skip1").addEventListener("click",skipIntro);
